@@ -17,6 +17,7 @@ cd tonkaviewbot
 
 run.bat
 ```
+After all the viewers are sent, wait 1-3 minutes for them to actually appear on the stream.
 
 ## Support
 ---
