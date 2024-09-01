@@ -5,3 +5,22 @@
 * The concept is straightforward: the software uses blockway, a proxy website that connects to your desired site through proxies. Selenium automates this process, making it easy for you to direct viewers to your stream.
 
 > ***⚠️ Important: It's recommended to run this software not on computer you’re streaming from or on a machine with plenty of RAM, as it opens many hidden tabs in the background to generate the viewers.***
+
+## 📥 USAGE
+---
+* Node.js must be installed.
+
+```cmd
+git clone https://github.com/TONKAFREAK/Twitch-View-Bot tonkaviewbot
+
+cd tonkaviewbot
+
+run.bat
+```
+
+## Support
+---
+> If have any questions feel free to join my [Discord](https://discord.gg/HVpmQWMs8F) server and ask!!
+
+# TANK YOU FOR USING MY SOFTWARE! ❤
+
