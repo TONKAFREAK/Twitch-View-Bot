@@ -4,4 +4,4 @@
 
 * The concept is straightforward: the software uses blockway, a proxy website that connects to your desired site through proxies. Selenium automates this process, making it easy for you to direct viewers to your stream.
 
-***⚠️ Important: It's recommended to run this software not on computer you’re streaming from or on a machine with plenty of RAM, as it opens many hidden tabs in the background to generate the viewers.***
+> ***⚠️ Important: It's recommended to run this software not on computer you’re streaming from or on a machine with plenty of RAM, as it opens many hidden tabs in the background to generate the viewers.***
