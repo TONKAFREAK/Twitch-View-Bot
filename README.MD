@@ -23,5 +23,9 @@ After all the viewers are sent, wait 1-3 minutes for them to actually appear on 
 ---
 > If have any questions feel free to join my [Discord](https://discord.gg/HVpmQWMs8F) server and ask!!
 
+## Full disclaimer
+---
+This project was established to contribute to open-source collaboration and showcase the educational value of reverse engineering. Although its primary purpose is for learning and understanding, users must be aware that altering viewer metrics on platforms such as Twitch violates their Terms of Service and could lead to legal repercussions. We urge users to engage with this tool responsibly. Misuse is solely at your discretion and risk. Discussions promoting illegal activities will be promptly removed.
+
 # TANK YOU FOR USING MY SOFTWARE! ❤
 
