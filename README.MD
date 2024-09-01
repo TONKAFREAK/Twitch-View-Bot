@@ -1,4 +1,4 @@
-# ⭐ No Proxy Needed! Please consider giving this project a star if you find it helpful. It's free and open source, and you can leave a star by clicking on the top right corner. ⭐
+### ⭐ No Proxy Needed! Please consider giving this project a star if you find it helpful. It's free and open source, and you can leave a star by clicking on the top right corner. ⭐
 
 This software lets you send viewers to your Twitch live stream without the need for a paid proxy. It uses Selenium to automate the process, connecting to proxy sites, entering your channel name. 
 This way, you can boost your viewer count through proxies at no cost.
