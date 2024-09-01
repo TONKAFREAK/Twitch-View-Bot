@@ -13,11 +13,11 @@ IF %ERRORLEVEL% EQU 0 (
 ) ELSE (
 
     echo Node.js is not installed.
-
     echo Downloading and installing Node.js...
 
-    powershell -command "& { \$url = 'https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi'; \$file = 'nodejs.msi'; \iwr $url -OutFile $file; \Start-Process $file -ArgumentList '/quiet' -Wait; \Remove-Item $file -Force; \}"
-
+    powershell -command "& { $url = 'https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi'; $file = 'nodejs.msi'; Invoke-WebRequest $url -OutFile $file; Start-Process msiexec.exe -ArgumentList '/i', $file, '/passive' -Wait; Remove-Item $file -Force; }"
+    
+    timeout /t 10 /nobreak > NUL
     echo Node.js installation complete.
     cls
 )

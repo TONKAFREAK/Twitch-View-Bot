@@ -7,7 +7,9 @@ async function setupDriver() {
     options.addArguments('--headless');
     options.addArguments('--disable-dev-shm-usage');
     options.addArguments('--mute-audio');
-    options.addArguments("--log-level=3")
+    options.addArguments("--log-level=3");
+    options.addArguments("--incognito");
+
     options.setAcceptInsecureCerts(true);
 
     let driver = new Builder()

@@ -55,6 +55,8 @@ async function sendViewer() {
         }
 
         sleep(999999999);
+
+        
     })
     .catch(error => {
         console.error(error);
@@ -62,6 +64,11 @@ async function sendViewer() {
 
 
 }
+
+process.on('SIGINT' || 'exit', async () => {
+    console.log(chalk.redBright(`\n\nShutting down the driver....`));
+    process.exit();       
+});
 
 sendViewer();
 
