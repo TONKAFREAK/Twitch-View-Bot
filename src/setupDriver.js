@@ -8,9 +8,10 @@ async function setupDriver() {
     options.addArguments('--disable-dev-shm-usage');
     options.addArguments('--mute-audio');
     options.addArguments("--log-level=3");
-    options.addArguments("--incognito");
+    //options.addArguments("--incognito");
     options.addArguments('--disable-gpu');
     options.addArguments('--no-sandbox');
+    options.addExtensions('./src/extension/adblocker.crx');
 
     options.setAcceptInsecureCerts(true);
 
