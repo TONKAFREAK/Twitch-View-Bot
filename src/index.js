@@ -9,123 +9,100 @@ function sleep(ms) {
 
 async function sendViewer() {
 
-    promptQuestion()
-    .then(async data => {
-        console.log(chalk.redBright(`\n---------------------------------------------------------------------------------------------------`));
-        console.log(chalk.greenBright(`Setting up driver....`));
-        let driver = await setupDriver();
-        console.log(chalk.greenBright(`\nDriver setup!`));
-        console.log(chalk.greenBright(`Sending ${data.viewers} view(s) to ${data.streamer}....( might take some time depending on the number of viewers )`));
-        let checkForDuplicate = true;
-        for (let i = 1; i < data.viewers+1; i++) {
-            try {
-                await driver.executeScript('window.open()');
-                let tabs = await driver.getAllWindowHandles();
-                await driver.switchTo().window(tabs[tabs.length - 1]);
-                if (i <= 10){
-                    await driver.get(`https://proxyium.com/`);
-                    let urlInput = await driver.findElement(By.id('unique-form-control'));
-                    await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
-                    await urlInput.sendKeys(Key.ENTER);
-                } else if(i > 10 && i <= 20) { 
-                    await driver.get(`https://www.croxyproxy.com/`);
-                    let urlInput = await driver.findElement(By.id('url'));
-                    await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
-                    await urlInput.sendKeys(Key.ENTER);
-                } else if (i > 20 && i <= 30) {
-                    await driver.get(`https://www.blockaway.net/`);
-                    let urlInput = await driver.findElement(By.id('url'));
-                    await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
-                    await urlInput.sendKeys(Key.ENTER);
-                } else if (i > 30 && i <= 40) {
-                    await driver.get(`https://www.croxyproxy.rocks`);
-                    let urlInput = await driver.findElement(By.id('url'));
-                    await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
-                    await urlInput.sendKeys(Key.ENTER);
-                } else if (i > 40 && i <= 50) {
-                    await driver.get(`https://www.croxy.org`);
-                    let urlInput = await driver.findElement(By.id('url'));
-                    await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
-                    await urlInput.sendKeys(Key.ENTER);
-                } else if (i > 50 && i <= 60) {
-                    await driver.get(`https://www.croxy.network`);
-                    let urlInput = await driver.findElement(By.id('url'));
-                    await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
-                    await urlInput.sendKeys(Key.ENTER);
-                } else if (i > 60 && i <= 70) {
-                    await driver.get(`https://www.croxyproxy.net`);
-                    let urlInput = await driver.findElement(By.id('url'));
-                    await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
-                    await urlInput.sendKeys(Key.ENTER);
-                } else {
-                    await driver.get(`https://www.youtubeunblocked.live`);
-                    let urlInput = await driver.findElement(By.id('url'));
-                    await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
-                    await urlInput.sendKeys(Key.ENTER);
-                }
-                
-                
-                if (i == 1){
-                    //console.log(chalk.green(`Sending ${i}st viewer`));
-                } else if (i == 2){
-                    //console.log(chalk.green(`Sending ${i}nd viewer`));
-                } else if (i == 3){
-                    //console.log(chalk.green(`Sending ${i}rd viewer`));
-                } else {
-                    //console.log(chalk.green(`Sending ${i}th viewer`));
-                }
-                await sleep(500);
-               
-            } catch (error) {
-                console.log(chalk.red(error));
-            }
-        }
+    try {
 
-        promptExit(data.viewers, data.streamer);
-
-        console.log(chalk.yellowBright(`\n---------------------------------------------------------------------------------------------------`));        
-
-        const tabs = await driver.getAllWindowHandles();
-        const urls = new Set();
-
-        for (let i = 0; i < tabs.length; i++) {
-            await driver.switchTo().window(tabs[i]);
-
-            if (checkForDuplicate) {
-                const currentUrl = await driver.executeScript("return window.location.href;");
-
-                if (urls.has(currentUrl)) {
-                    
-                    console.log(chalk.yellow(`Duplicate proxy found on tab ${i + 1}: ${currentUrl} - Sending a new one`));
-                    await driver.get('https://www.blockaway.net/');
-                    let urlInput = await driver.findElement(By.id('url'));
-                    await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
-                    await urlInput.sendKeys(Key.ENTER);
-                    await sleep(500);
-                } else {
-                    urls.add(currentUrl);
-                }
-            }
+        promptQuestion()
+        .then(async data => {
+            console.log(chalk.redBright(`\n---------------------------------------------------------------------------------------------------`));
+            console.log(chalk.greenBright(`Setting up driver....`));
+            let driver = await setupDriver();
+            console.log(chalk.greenBright(`\nDriver setup!`));
+            console.log(chalk.greenBright(`Sending ${data.viewers} view(s) to ${data.streamer}....( might take some time depending on the number of viewers )`));
             
-            await sleep(2000);
+            const proxySites = [
+                'https://proxyium.com/',
+                'https://www.croxyproxy.com/',
+                'https://www.blockaway.net/',
+                'https://www.croxyproxy.rocks',
+                'https://www.croxy.org',
+                'https://www.croxy.network',
+                'https://www.croxyproxy.net',
+            ];
 
-            if (i == tabs.length - 1) {
-                checkForDuplicate = false;
-                console.log(urls);
-                urls.clear();
-                i = 0;
+            let checkForDuplicate = true;
+            for (let i = 1; i <= data.viewers; i++) {
+                try {
+                    await driver.executeScript('window.open()');
+                    let tabs = await driver.getAllWindowHandles();
+                    await driver.switchTo().window(tabs[tabs.length - 1]);
+                    
+                    let proxyIndex = (i - 1) % proxySites.length;
+                    let proxySite = proxySites[proxyIndex];
+                    
+                    await driver.get(proxySite);
+                    let urlInput;
+                    
+                    if (proxySite.includes('proxyium')) {
+                        urlInput = await driver.findElement(By.id('unique-form-control'));
+                    } else {
+                        urlInput = await driver.findElement(By.id('url'));
+                    }
+                    await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
+                    await urlInput.sendKeys(Key.ENTER);
 
+                    console.log(chalk.green(`Sending viewer ${i} using ${proxySite}`));
+
+                    await sleep(500);
+
+                } catch (error) {
+                    console.log(chalk.red(error));
+                }
             }
-        }
-        sleep(999999999);
 
-        
-    })
-    .catch(error => {
+            promptExit(data.viewers, data.streamer);
+
+            console.log(chalk.yellowBright(`\n---------------------------------------------------------------------------------------------------`));        
+
+            const tabs = await driver.getAllWindowHandles();
+            const urls = new Set();
+
+            for (let i = 0; i < tabs.length; i++) {
+                await driver.switchTo().window(tabs[i]);
+
+                if (checkForDuplicate) {
+                    const currentUrl = await driver.executeScript("return window.location.href;");
+
+                    if (urls.has(currentUrl)) {
+                        console.log(chalk.yellow(`Duplicate proxy found on tab ${i + 1}: ${currentUrl} - Sending a new one`));
+                        await driver.get('https://www.youtubeunblocked.live');
+                        let urlInput = await driver.findElement(By.id('url'));
+                        await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
+                        await urlInput.sendKeys(Key.ENTER);
+                        await sleep(500);
+                    } else {
+                        urls.add(currentUrl);
+                    }
+                }
+
+                await sleep(2000);
+
+                if (i == tabs.length - 1) {
+                    checkForDuplicate = false;
+                    console.log(urls);
+                    urls.clear();
+                    i = 0;
+                }
+            }
+            sleep(999999999);
+
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+    } catch (error) {
         console.error(error);
-    });
-
-
+    }
 }
 
 process.on('SIGINT' || 'exit', async () => {

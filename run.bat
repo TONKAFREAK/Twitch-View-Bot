@@ -1,14 +1,13 @@
 @echo off
 
 echo Checking for Node.js...
-powershell -Command "Start-Sleep -Milliseconds 500"
 
 node -v >nul 2>&1
 
 IF %ERRORLEVEL% EQU 0 (
 
     echo Node.js is installed.
-    powershell -Command "Start-Sleep -Milliseconds 500"
+   
     cls
 ) ELSE (
 
