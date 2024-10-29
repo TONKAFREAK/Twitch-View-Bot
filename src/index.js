@@ -29,8 +29,11 @@ async function sendViewer() {
                 'https://www.croxyproxy.net',
             ];
 
+            let viewersPromises = [];
+
             let checkForDuplicate = true;
             for (let i = 1; i <= data.viewers; i++) {
+                viewersPromises.push((async () => {
                 try {
                     await driver.executeScript('window.open()');
                     let tabs = await driver.getAllWindowHandles();
@@ -50,6 +53,8 @@ async function sendViewer() {
                     await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
                     await urlInput.sendKeys(Key.ENTER);
 
+                    console.log("pressed enter");
+
                     console.log(chalk.green(`Sending viewer ${i} using ${proxySite}`));
 
                     await sleep(500);
@@ -58,6 +63,12 @@ async function sendViewer() {
                     console.log(chalk.red(error));
                 }
             }
+
+            )());
+
+        }
+
+            await Promise.all(viewersPromises);
 
             promptExit(data.viewers, data.streamer);
 
