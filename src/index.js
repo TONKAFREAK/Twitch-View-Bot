@@ -1,5 +1,5 @@
 const chalk = require('chalk');
-const { By, Key } = require('selenium-webdriver');
+const { By, Key, until, Actions  } = require('selenium-webdriver');
 const {promptQuestion, promptExit} = require("./cli");
 const setupDriver = require("./setupDriver");
 
@@ -29,46 +29,58 @@ async function sendViewer() {
                 'https://www.croxyproxy.net',
             ];
 
-            let viewersPromises = [];
-
             let checkForDuplicate = true;
             for (let i = 1; i <= data.viewers; i++) {
-                viewersPromises.push((async () => {
                 try {
-                    await driver.executeScript('window.open()');
-                    let tabs = await driver.getAllWindowHandles();
-                    await driver.switchTo().window(tabs[tabs.length - 1]);
+                    console.log(chalk.yellow(`\nStarting viewer ${i}...`));
+            
                     
-                    let proxyIndex = (i - 1) % proxySites.length;
-                    let proxySite = proxySites[proxyIndex];
+                    driver.executeScript('window.open("");');
+                    const tabs = await driver.getAllWindowHandles();
+                    await driver.switchTo().window(tabs[tabs.length - 1]);
+            
+                    
+                    const proxyIndex = (i - 1) % proxySites.length;
+                    const proxySite = proxySites[proxyIndex];
+                    console.log(chalk.blue(`Navigating to proxy site: ${proxySite}`));
+            
                     
                     await driver.get(proxySite);
-                    let urlInput;
+            
                     
-                    if (proxySite.includes('proxyium')) {
-                        urlInput = await driver.findElement(By.id('unique-form-control'));
-                    } else {
-                        urlInput = await driver.findElement(By.id('url'));
+                    let urlInput;
+                    try {
+                        if (proxySite.includes('proxyium')) {
+                            urlInput = await driver.wait(
+                                until.elementLocated(By.id('unique-form-control')),
+                                10000 
+                            );
+
+                        } else {
+                            urlInput = await driver.wait(
+                                until.elementLocated(By.id('url')),
+                                10000 
+                            );
+                        }
+                        
+                    } catch (error) {
+                        console.log(chalk.red(`Input field not found on ${proxySite} for viewer ${i}. Skipping...`));
+                        continue;
                     }
+            
+                    
                     await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
                     await urlInput.sendKeys(Key.ENTER);
-
-                    console.log("pressed enter");
-
-                    console.log(chalk.green(`Sending viewer ${i} using ${proxySite}`));
-
-                    await sleep(500);
-
+                    console.log(chalk.green(`Viewer ${i} sent using ${proxySite}`));
+            
+                    
+                    await sleep(1000);
+            
                 } catch (error) {
-                    console.log(chalk.red(error));
+                    console.log(chalk.red(`Error with viewer ${i}: ${error.message}`));
+                    continue; 
                 }
             }
-
-            )());
-
-        }
-
-            await Promise.all(viewersPromises);
 
             promptExit(data.viewers, data.streamer);
 
@@ -84,7 +96,7 @@ async function sendViewer() {
                     const currentUrl = await driver.executeScript("return window.location.href;");
 
                     if (urls.has(currentUrl)) {
-                        console.log(chalk.yellow(`Duplicate proxy found on tab ${i + 1}: ${currentUrl} - Sending a new one`));
+                        console.log(chalk.yellow(`Duplicate proxy found on tab ${i }: ${currentUrl} - Sending a new one`));
                         await driver.get('https://www.youtubeunblocked.live');
                         let urlInput = await driver.findElement(By.id('url'));
                         await urlInput.sendKeys(`https://www.twitch.tv/${data.streamer}`);
@@ -99,7 +111,7 @@ async function sendViewer() {
 
                 if (i == tabs.length - 1) {
                     checkForDuplicate = false;
-                    console.log(urls);
+                    //console.log(urls);
                     urls.clear();
                     i = 0;
                 }

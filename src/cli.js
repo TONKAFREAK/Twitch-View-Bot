@@ -47,7 +47,7 @@ function promptQuestion() {
 }
 
 function promptExit(viewers, streamer) {
-    console.log(chalk.greenBright("Sent "+viewers+" view(s) to "+streamer+"!"));
+    console.log(chalk.greenBright("\nSent "+viewers+" view(s) to "+streamer+"!"));
     console.log(chalk.greenBright("Keep this console open to maintain the viewers!"));
     console.log(chalk.redBright("Press \"CTRL + C\" to exit or just close the console."));
     console.log(chalk.yellow("Dont forget to star the repo! https://github.com/TONKAFREAK/Twitch-View-Bot"));
