@@ -23,24 +23,27 @@ function promptQuestion() {
     console.log(chalk.red(tonka));
 
     return new Promise((resolve, reject) => {
-        rl.question(chalk.green("Enter your Channel Name: "), (streamer) => {
-            rl.question(chalk.cyanBright("Enter number of viewers: "), (viewers) => {
-                if (!isNaN(parseInt(viewers))) {
-                    resolve({ streamer, viewers: parseInt(viewers) });
-                    rl.close();
-                } else {
-                    console.log(chalk.red("Invalid number. Please try again."));
-                    rl.question(chalk.cyanBright("Enter number of viewers: "), (viewers) => {
-                        if (!isNaN(parseInt(viewers))) {
-                            resolve({ streamer, viewers: parseInt(viewers) });
-                            rl.close();
-                        } else {
-                            console.log(chalk.red("Invalid number. Terminating the program..."));
-                            rl.close();
-                            process.exit();
-                        }
-                    });
-                }
+        rl.question(chalk.green("Use GPU? (y/n): "), (useGPU) => {
+            useGPU = useGPU === 'y' || useGPU === 'Y' ? true : false;
+            rl.question(chalk.green("Enter your Channel Name: "), (streamer) => {
+                rl.question(chalk.cyanBright("Enter number of viewers: "), (viewers) => {
+                    if (!isNaN(parseInt(viewers))) {
+                        resolve({ streamer, viewers: parseInt(viewers), useGPU });
+                        rl.close();
+                    } else {
+                        console.log(chalk.red("Invalid number. Please try again."));
+                        rl.question(chalk.cyanBright("Enter number of viewers: "), (viewers) => {
+                            if (!isNaN(parseInt(viewers))) {
+                                resolve({ streamer, viewers: parseInt(viewers), useGPU });
+                                rl.close();
+                            } else {
+                                console.log(chalk.red("Invalid number. Terminating the program..."));
+                                rl.close();
+                                process.exit();
+                            }
+                        });
+                    }
+                });
             });
         });
     });
