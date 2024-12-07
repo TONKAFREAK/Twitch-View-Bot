@@ -25,6 +25,7 @@ function promptQuestion() {
     return new Promise((resolve, reject) => {
         rl.question(chalk.green("Use GPU? (y/n): "), (useGPU) => {
             useGPU = useGPU === 'y' || useGPU === 'Y' ? true : false;
+            //console.log(useGPU);
             rl.question(chalk.green("Enter your Channel Name: "), (streamer) => {
                 rl.question(chalk.cyanBright("Enter number of viewers: "), (viewers) => {
                     if (!isNaN(parseInt(viewers))) {

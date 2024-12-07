@@ -15,7 +15,8 @@ async function sendViewer() {
         .then(async data => {
             console.log(chalk.redBright(`\n---------------------------------------------------------------------------------------------------`));
             console.log(chalk.greenBright(`Setting up driver....`));
-            let driver = await setupDriver();
+            //console.log(data.useGPU);
+            let driver = await setupDriver(data.useGPU);
             console.log(chalk.greenBright(`\nDriver setup!`));
             console.log(chalk.greenBright(`Sending ${data.viewers} view(s) to ${data.streamer}....( might take some time depending on the number of viewers )`));
             
