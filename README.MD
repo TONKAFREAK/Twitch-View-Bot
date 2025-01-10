@@ -25,6 +25,8 @@ git clone https://github.com/TONKAFREAK/Twitch-View-Bot tonkaviewbot
 
 cd tonkaviewbot
 
+npm i
+
 node src/index.js
 ```
 After all the viewers are sent, wait 1-3 minutes for them to actually appear on the stream.
