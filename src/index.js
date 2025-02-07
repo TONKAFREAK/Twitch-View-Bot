@@ -95,8 +95,8 @@ async function sendViewer() {
 
                 if (checkForDuplicate) {
                     const currentUrl = await driver.executeScript("return window.location.href;");
-
-                    if (urls.has(currentUrl)) {
+                    let needRestart = await checkAndRestartStream(driver, data.streamer, i);
+                    if (urls.has(currentUrl || !needRestart)) {
                         console.log(chalk.yellow(`Duplicate proxy found on tab ${i }: ${currentUrl} - Sending a new one`));
                         await driver.get('https://www.youtubeunblocked.live');
                         let urlInput = await driver.findElement(By.id('url'));
@@ -133,6 +133,73 @@ process.on('SIGINT' || 'exit', async () => {
     console.log(chalk.redBright(`\n\nShutting down the driver....`));
     process.exit();       
 });
+
+async function checkAndRestartStream(driver, streamer, streamcount) {
+    try {
+        console.log(`verify stream number ${streamcount}...`);
+
+        if (await isStreamPlaying(driver)) {
+            console.log("✅ Stream loaded successfully!");
+
+            // Human interactions
+            await humanizeInteraction(driver);
+            await randomScroll(driver); //Optional
+            return true;
+        }
+
+        console.log(`Failed to load stream: ${streamcount}.`);
+        return false;
+    } catch (error) {
+        console.log(`Failed to load stream ${streamcount}.`);
+        return false;
+    }
+}
+
+async function isStreamPlaying(driver) {
+    try {
+        let player = await driver.findElements(By.css('[data-a-target="video-player"]'));
+        return player.length > 0;
+    } catch (error) {
+        console.log("Error on validation player:", error);
+        return false;
+    }
+}
+
+async function humanizeInteraction(driver) {
+    try {
+        let actions = driver.actions({ async: true });
+
+        let player = await driver.findElement(By.css('[data-a-target="video-player"]'));
+
+        if (player) {
+            console.log("🐭 moving mouse...");
+            await actions.move({ origin: player }).perform();
+        }
+
+        //Short random pause to simulate human behavior
+        let randomWait = Math.floor(Math.random() * (3000 - 1500 + 1)) + 1500;
+        await new Promise(r => setTimeout(r, randomWait));
+
+    } catch (error) {
+        console.log("❌ Error when trying to humanize the interaction:", error);
+    }
+}
+
+async function randomScroll(driver) {
+    try {
+        let scrollAmount = Math.floor(Math.random() * 400) + 100; // Between 100px and 500px
+        console.log(`📜 Scrolling the page: ${scrollAmount}px`);
+
+        await driver.executeScript(`window.scrollBy(0, ${scrollAmount});`);
+
+        // Small random pause
+        let randomWait = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
+        await new Promise(r => setTimeout(r, randomWait));
+
+    } catch (error) {
+        console.log("❌ Error when trying to scroll the page:", error);
+    }
+}
 
 sendViewer();
 
