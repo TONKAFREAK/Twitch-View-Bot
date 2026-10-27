@@ -1,10 +1,6 @@
 const readline = require('readline');
 const chalk = require('chalk');
-
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+const { summarizeSessions } = require('./sessions');
 
 const tonka = `
 \t\t\t  ▄▄▄█████▓ ▒█████   ███▄    █  ██ ▄█▀▄▄▄         
@@ -20,6 +16,7 @@ const tonka = `
 \t\t\t\t   https://discord.gg/HVpmQWMs8F\n\n`;
 
 function promptQuestion() {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
     console.log(chalk.red(tonka));
 
     return new Promise((resolve, reject) => {
@@ -27,13 +24,14 @@ function promptQuestion() {
             useGPU = useGPU === 'y' || useGPU === 'Y' ? true : false;
             //console.log(useGPU);
             rl.question(chalk.green("Enter your Channel Name: "), (streamer) => {
-                rl.question(chalk.cyanBright("Enter number of viewers: "), (viewers) => {
+                streamer = streamer.trim();
+                rl.question(chalk.cyanBright("Enter number of browser sessions: "), (viewers) => {
                     if (!isNaN(parseInt(viewers))) {
                         resolve({ streamer, viewers: parseInt(viewers), useGPU });
                         rl.close();
                     } else {
                         console.log(chalk.red("Invalid number. Please try again."));
-                        rl.question(chalk.cyanBright("Enter number of viewers: "), (viewers) => {
+                        rl.question(chalk.cyanBright("Enter number of browser sessions: "), (viewers) => {
                             if (!isNaN(parseInt(viewers))) {
                                 resolve({ streamer, viewers: parseInt(viewers), useGPU });
                                 rl.close();
@@ -50,11 +48,20 @@ function promptQuestion() {
     });
 }
 
-function promptExit(viewers, streamer) {
-    console.log(chalk.greenBright("\nSent "+viewers+" view(s) to "+streamer+"!"));
-    console.log(chalk.greenBright("Keep this console open to maintain the viewers!"));
-    console.log(chalk.redBright("Press \"CTRL + C\" to exit or just close the console."));
-    console.log(chalk.yellow("Dont forget to star the repo! https://github.com/TONKAFREAK/Twitch-View-Bot"));
+function printSummary(sessions, streamer) {
+    const counts = summarizeSessions(sessions);
+    console.log(`\nLatest checks for ${streamer}: ${counts.total} attempted | ${counts.playing} playing | ${counts.unverified} unverified | ${counts.blocked} blocked | ${counts.failed} failed`);
+    console.log('Playing means observed video playback. Twitch-counted viewers: unknown.');
 }
 
-module.exports = { promptQuestion, promptExit };
+function promptExit(sessions, streamer) {
+    printSummary(sessions, streamer);
+    if (sessions.some((session) => session.submitted)) {
+        console.log('Rechecking playback after each 30-second monitoring pause.');
+        console.log(chalk.redBright('Press CTRL + C to close the browser and exit.'));
+    } else {
+        console.log('No sessions were submitted. Closing the browser.');
+    }
+}
+
+module.exports = { promptQuestion, promptExit, printSummary };

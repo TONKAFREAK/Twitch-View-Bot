@@ -1,10 +1,10 @@
 ## ⭐ No Proxy Needed! Please consider giving this project a star if you find it helpful. It's free and open source, and you can leave a star by clicking on the top right corner. ⭐
 ---
-* This software lets you send viewers to your Twitch live stream without the need for a paid proxy. It uses Selenium to automate the process, connecting to proxy sites, entering your channel name. <br>This way, you can boost your viewer count through proxies at no cost.
+* This software uses Selenium to submit a Twitch channel URL through proxy websites and check observable browser playback. Browser sessions do not prove an increase in Twitch's viewer count.
 
-* The concept is straightforward: the software uses blockway, a proxy website that connects to your desired site through proxies. Selenium automates this process, making it easy for you to direct viewers to your stream.
+* Each session is reported as playing, unverified, blocked, or failed, with a reason. Submitted sessions are checked again while the program remains open.
 
-> ***⚠️ Important: It's recommended to run this software not on computer you’re streaming from or on a machine with plenty of RAM, as it opens many hidden tabs in the background to generate the viewers.***
+> ***⚠️ Important: Many browser tabs can use substantial RAM and CPU.***
 
 ## 📥 USAGE
 ---
@@ -29,7 +29,75 @@ npm i
 
 node src/index.js
 ```
-After all the viewers are sent, wait 1-3 minutes for them to actually appear on the stream.
+### Reading the session results
+
+Each new session blocks automatic media playback before loading the page. After
+submitting the channel URL, it locates the requested channel's player (including
+inside frames), pauses any detected playback, and uses Selenium to click its
+visible, enabled **Play** button. The playback checks run after that click.
+A missing or inaccessible Play button is reported as unverified or blocked;
+there is no direct `video.play()` fallback. Monitoring retries a missing button,
+but does not click the Play/Pause toggle again after a successful click.
+
+Submitting a URL is only an attempt. The console reports each browser session as:
+
+* **Playing:** a visible player associated with the requested channel advanced
+  across multiple observations over at least two seconds, with presented frames
+  advancing when the browser exposes that information.
+* **Unverified:** the player could not be identified or inspected, is paused or
+  stalled, or is displaying a recognized advertisement.
+* **Blocked:** a recognized access challenge, offline notice, or player gate is
+  visible.
+* **Failed:** navigation, form submission, tab access, or video playback failed.
+
+The checker looks inside visible frames and uses the channel/player URL or
+canonical page metadata to identify the requested channel. A proxy that hides
+this evidence remains unverified. Page markup and ad indicators can change, so
+these are conservative browser observations, not a guarantee that live stream
+content is playing or that Twitch counted a viewer. Twitch's
+[Get Streams API](https://dev.twitch.tv/docs/api/reference/#get-streams) exposes
+an aggregate viewer count; it cannot attribute a count increase to one of these
+browser sessions.
+
+Totals reflect observed outcomes, including failures. After setup, the program
+pauses for 30 seconds between monitoring passes and reports status changes.
+Each pass takes additional time to inspect all submitted sessions. Identical
+proxy URLs do not prove duplicate viewers and no longer cause tabs to be replaced.
+Press Ctrl+C to close the browser.
+
+Run regression tests with `npm test`. The optional browser checks use only local
+fixture pages and require working Chrome setup:
+
+```bash
+node --test test/browser/playback.test.js
+```
+
+### Chrome exits immediately on Ubuntu
+
+If startup fails with `SessionNotCreatedError`, check `chromedriver.log` in the
+project directory. If it contains `No usable sandbox!`, Ubuntu's AppArmor user
+namespace restrictions may be preventing Selenium's downloaded Chrome from
+starting. Chrome and ChromeDriver can have matching versions and still hit this
+error.
+
+For full driver diagnostics, run `CHROMEDRIVER_VERBOSE=1 node src/index.js`.
+
+For the default Selenium cache on Ubuntu 24.04+, run this once as your normal
+user from the project directory (it requests your sudo password):
+
+```bash
+bash scripts/allow-selenium-chrome.sh
+node src/index.js
+```
+
+The script validates and installs an AppArmor profile for only
+`$HOME/.cache/selenium/chrome/linux64/*/chrome`. It allows Chrome to create its
+sandbox, including after Selenium updates Chrome. Review the generated profile
+without installing it with `bash scripts/allow-selenium-chrome.sh --print`.
+The profile grants user namespace access to any executable at that path, so keep
+that cache under your control. See the
+[Chromium documentation](https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md)
+for background. Chrome's sandbox remains enabled.
 
 ## Support
 ---
